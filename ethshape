@@ -29,23 +29,23 @@ function enable_shape() {
 	tc class replace dev ${INTERFACE} parent 1:1 classid 1:10 htb rate 3mbit ceil ${BANDWIDTH_LIMIT} prio 1
 	tc class replace dev ${INTERFACE} parent 1:1 classid 1:20 htb rate 1Gbit ceil 1Gbit prio 2
 	
-	##
 	# FQ_Codel queuing within each class
-	#
 	tc qdisc replace dev ${INTERFACE} parent 1:10 fq_codel
 	tc qdisc replace dev ${INTERFACE} parent 1:20 fq_codel
 	
-	##
 	# Assign geth/prysm destination and source ports to class 1:10
-	#
 	for port in "${P1_PORTS[@]}"
 	do
 	    tc filter replace dev ${INTERFACE} parent 1: prio 1 u32 match ip dport ${port} 0xffff classid 1:10
 	    tc filter replace dev ${INTERFACE} parent 1: prio 1 u32 match ip sport ${port} 0xffff classid 1:10
 	done
+
+	# Display configuration
+	tc qdisc show dev ${INTERFACE}
 }
 
 function disable_shape() {
+  # Remove and display
   tc qdisc del dev ${INTERFACE} root
   tc qdisc show dev ${INTERFACE}
 }
