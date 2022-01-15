@@ -21,9 +21,6 @@ if [ $(id -u) != 0 ]; then
 fi
 
 function enable_shape() {
-	# Delete Existing
-	tc qdisc del dev ${INTERFACE} root
-	
 	# Init
 	tc qdisc replace dev ${INTERFACE} root handle 1: htb default 20
 	tc class replace dev ${INTERFACE} parent 1: classid 1:1 htb rate 1Gbit
@@ -62,5 +59,10 @@ case "$1" in
       disable_shape
       ;;
 
-    *) echo "usage: $0 [start|stop]"; exit 1
+    restart)
+      disable_shape
+      enable_shape
+      ;;
+
+    *) echo "usage: $0 [start|stop|restart]"; exit 1
 esac
