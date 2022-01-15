@@ -21,50 +21,50 @@ if [ $(id -u) != 0 ]; then
 fi
 
 function enable_shape() {
-	# Init
-        tc qdisc del dev ${INTERFACE} root &> /dev/null
-        tc qdisc replace dev ${INTERFACE} root handle 1: htb default 20
-	tc class replace dev ${INTERFACE} parent 1: classid 1:1 htb rate 1Gbit
-	
-	# Ethereum and Default Classes
-	tc class replace dev ${INTERFACE} parent 1:1 classid 1:10 htb rate 3mbit ceil ${BANDWIDTH_LIMIT} prio 1
-	tc class replace dev ${INTERFACE} parent 1:1 classid 1:20 htb rate 1Gbit ceil 1Gbit prio 2
-	
-	# FQ_Codel queuing within each class
-	tc qdisc replace dev ${INTERFACE} parent 1:10 fq_codel
-	tc qdisc replace dev ${INTERFACE} parent 1:20 fq_codel
-	
-	# Assign geth/prysm destination and source ports to class 1:10
-	for port in "${P1_PORTS[@]}"
-	do
-	    tc filter replace dev ${INTERFACE} parent 1: prio 1 u32 match ip dport ${port} 0xffff classid 1:10
-	    tc filter replace dev ${INTERFACE} parent 1: prio 1 u32 match ip sport ${port} 0xffff classid 1:10
-	done
+	  # Init
+    tc qdisc del dev ${INTERFACE} root &> /dev/null
+    tc qdisc replace dev ${INTERFACE} root handle 1: htb default 20
+	  tc class replace dev ${INTERFACE} parent 1: classid 1:1 htb rate 1Gbit
 
-	# Display configuration
-	tc qdisc show dev ${INTERFACE}
-	tc filter show dev ${INTERFACE}
+	  # Ethereum and Default Classes
+	  tc class replace dev ${INTERFACE} parent 1:1 classid 1:10 htb rate 3mbit ceil ${BANDWIDTH_LIMIT} prio 1
+	  tc class replace dev ${INTERFACE} parent 1:1 classid 1:20 htb rate 1Gbit ceil 1Gbit prio 2
+
+	  # FQ_Codel queuing within each class
+	  tc qdisc replace dev ${INTERFACE} parent 1:10 fq_codel
+	  tc qdisc replace dev ${INTERFACE} parent 1:20 fq_codel
+
+	  # Assign geth/prysm destination and source ports to class 1:10
+	  for port in "${P1_PORTS[@]}"
+	  do
+	      tc filter replace dev ${INTERFACE} parent 1: prio 1 u32 match ip dport ${port} 0xffff classid 1:10
+	      tc filter replace dev ${INTERFACE} parent 1: prio 1 u32 match ip sport ${port} 0xffff classid 1:10
+	  done
+
+	  # Display configuration
+	  tc qdisc show dev ${INTERFACE}
+	  tc filter show dev ${INTERFACE}
 }
 
 function disable_shape() {
-  # Remove and display, ignore tc error on del
-  tc qdisc del dev ${INTERFACE} root &> /dev/null
-  tc qdisc show dev ${INTERFACE}
+    # Remove and display, ignore tc error on del
+    tc qdisc del dev ${INTERFACE} root &> /dev/null
+    tc qdisc show dev ${INTERFACE}
 }
 
 case "$1" in
     start)
-      enable_shape
-      ;;
+        enable_shape
+        ;;
 
     stop)
-      disable_shape
-      ;;
+        disable_shape
+        ;;
 
     restart)
-      disable_shape
-      enable_shape
-      ;;
+        disable_shape
+        enable_shape
+        ;;
 
     *) echo "usage: $0 [start|stop|restart]"; exit 1
 esac
