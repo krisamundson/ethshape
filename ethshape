@@ -45,8 +45,8 @@ function enable_shape() {
 }
 
 function disable_shape() {
-  # Remove and display
-  tc qdisc del dev ${INTERFACE} root 2>&1
+  # Remove and display, ignore tc error on del
+  tc qdisc del dev ${INTERFACE} root &> /dev/null
   tc qdisc show dev ${INTERFACE}
 }
 
