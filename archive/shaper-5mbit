@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# sudo tc qdisc add dev enp5s0 root tbf rate 6000kbit latency 5ms burst 1540
+sudo tc qdisc add dev enp5s0 root tbf rate 5mbit latency 1ms burst 3000
+# sudo tc qdisc add dev enp5s0 root netem loss 0.1%
+# sudo tc qdisc del dev enp5s0 root
+sudo tc qdisc show dev enp5s0
