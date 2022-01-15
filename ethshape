@@ -22,7 +22,8 @@ fi
 
 function enable_shape() {
 	# Init
-	tc qdisc replace dev ${INTERFACE} root handle 1: htb default 20
+        tc qdisc del dev ${INTERFACE} root &> /dev/null
+        tc qdisc replace dev ${INTERFACE} root handle 1: htb default 20
 	tc class replace dev ${INTERFACE} parent 1: classid 1:1 htb rate 1Gbit
 	
 	# Ethereum and Default Classes
@@ -42,6 +43,7 @@ function enable_shape() {
 
 	# Display configuration
 	tc qdisc show dev ${INTERFACE}
+	tc filter show dev ${INTERFACE}
 }
 
 function disable_shape() {
