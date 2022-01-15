@@ -46,7 +46,7 @@ function enable_shape() {
 
 function disable_shape() {
   # Remove and display
-  tc qdisc del dev ${INTERFACE} root
+  tc qdisc del dev ${INTERFACE} root 2>&1
   tc qdisc show dev ${INTERFACE}
 }
 
